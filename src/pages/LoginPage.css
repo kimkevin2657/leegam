@@ -1,0 +1,38 @@
+/* LoginPage.css */
+.login-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background-color: #fff;
+  }
+  
+  .login-container .MuiTextField-root,
+  .login-container .MuiButton-root {
+    margin: 10px 0;
+    width: 90%; /* Adjust width as per your preference */
+    max-width: 400px; /* Ensuring it doesn't stretch too much on larger screens */
+  }
+  
+  .MuiButton-containedPrimary {
+    background-color: #1a73e8; /* Google's button color */
+    color: #fff;
+  }
+  
+  .MuiButton-root {
+    text-transform: none; /* To prevent capitalization of button text */
+  }
+  
+  .MuiOutlinedInput-input {
+    padding: 15px;
+  }
+  
+  .MuiInputLabel-outlined {
+    transform: translate(14px, 15px) scale(1);
+  }
+  
+  .MuiInputLabel-outlined.MuiInputLabel-shrink {
+    transform: translate(14px, -6px) scale(0.75);
+  }
+  
