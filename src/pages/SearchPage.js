@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Pagination from '@material-ui/lab/Pagination';
 import {
   TextField,
   Button,
@@ -13,16 +15,82 @@ import {
   AppBar,
   Toolbar,
   Typography,
+  TablePagination
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 // import MuiAlert from '@material-ui/lab/Alert';
 
 const useStyles = makeStyles((theme) => ({
+  pageContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    minHeight: '100vh',
+    backgroundColor: '#fff',
+  },
+  contentWrap: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  header: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    padding: theme.spacing(1, 2),
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+  },
+  logo: {
+    height: '50px',
+  },
+  navLink: {
+    color: theme.palette.primary.main,
+    cursor: 'pointer',
+    marginRight: theme.spacing(2),
+    '&:last-child': {
+      marginRight: 0,
+    },
+  },
+  registrationContainer: {
+    width: '100%', // Adjust as needed
+  },
+  textField: {
+    margin: theme.spacing(1),
+    width: '90%',
+    maxWidth: '400px',
+  },
+  button: {
+    margin: theme.spacing(1),
+    textTransform: 'none',
+    backgroundColor: '#1a73e8',
+    color: '#fff',
+    '&:hover': {
+      backgroundColor: '#1769aa',
+    },
+  },
+  footer: {
+    backgroundColor: '#111111',
+    color: 'white',
+    textAlign: 'center',
+    padding: theme.spacing(2),
+  },
+  // searchContainer: {
+  //   padding: theme.spacing(2),
+  //   textAlign: 'center',
+  //   backgroundColor: '#f5f5f5',
+  //   minHeight: '100vh',
+  // },
   searchContainer: {
     padding: theme.spacing(2),
     textAlign: 'center',
     backgroundColor: '#f5f5f5',
     minHeight: '100vh',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center', // Center align children horizontally
+    justifyContent: 'center', // Center align children vertically
   },
   searchBar: {
     margin: theme.spacing(2, 0),
@@ -34,12 +102,30 @@ const useStyles = makeStyles((theme) => ({
   table: {
     marginTop: theme.spacing(2),
   },
+  // inquirySection: {
+  //   marginTop: theme.spacing(2),
+  // },
+  // inquiryInput: {
+  //   width: '60%',
+  //   marginBottom: theme.spacing(2),
+  // },
   inquirySection: {
-    marginTop: theme.spacing(2),
+    width: '100%',
+    textAlign: 'center',
+    [theme.breakpoints.up('md')]: {
+      width: '60%',
+    },
+    margin: theme.spacing(2, 0),
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center', // Aligns children (TextField and Button) in the center
   },
   inquiryInput: {
-    width: '100%',
+    width: '100%', // Takes full width of its parent (inquirySection)
     marginBottom: theme.spacing(2),
+    '& .MuiInputBase-input': {
+      height: '4rem', // Double the height of the input
+    },
   },
   searchForm: {
     display: 'flex',
@@ -49,6 +135,7 @@ const useStyles = makeStyles((theme) => ({
     '& > *': { // Applies to all immediate children
       margin: theme.spacing(1), // Spacing between each child
     },
+    width: "100%",
   },
   topBanner: {
     width: '100%',
@@ -66,6 +153,15 @@ const useStyles = makeStyles((theme) => ({
       paddingBottom: theme.spacing(3),  // Add padding to the bottom of the cell
     },
   },
+  tableContainer: {
+    width: '100%',
+    margin: 'auto', // Center align the table
+    [theme.breakpoints.up('md')]: {
+      width: '60%',
+    },
+    marginTop: theme.spacing(2),
+  },
+
 }));
 
 // const Alert = (props) => <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -75,6 +171,16 @@ const SearchPage = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [inquiry, setInquiry] = useState('');
   const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
+
+  // State for current page
+  const [page, setPage] = useState(1);
+
+  // Handle change page
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+    // Additional logic to load data for the new page
+  };
 
   const handleSearch = (event) => {
     event.preventDefault();
@@ -102,31 +208,34 @@ const SearchPage = () => {
     // Logic for logging out the user
   };
 
+  const logoClick = () => {
+    // Perform login logic
+    // https://www.yigam.co.kr/img/logo_210517d.jpg
+    navigate('/search');
+  };
+
   return (
     <div>
-      <AppBar position="static" color="default" className={classes.topBanner}>
-        <Toolbar>
-          <Typography variant="h6" className={classes.title}>
-            로고
-          </Typography>
-          <Button color="inherit" onClick={handleLogout} className={classes.logoutButton}>
-            로그아웃
-          </Button>
-        </Toolbar>
-      </AppBar>
+        <div className={classes.header}>
+          <img src="https://www.yigam.co.kr/img/logo_210517d.jpg" alt="Logo" className={classes.logo} onClick={() => logoClick()}/>
+          <div>
+            <span className={classes.navLink} onClick={() => navigate('/login')}>로그아웃</span>
+            <span className={classes.navLink} onClick={() => navigate('/search')}>검색페이지</span>
+          </div>
+        </div>
         <div className={classes.searchContainer}>
             <form onSubmit={handleSearch} className={classes.searchForm}>
                 <TextField
                 className={classes.searchBar}
                 variant="outlined"
-                placeholder="Search..."
+                placeholder="질문을 입력해주세요..."
                 fullWidth
                 />
                 <Button type="submit" variant="contained" color="primary">
-                Search
+                검색하기
                 </Button>
             </form>
-            <TableContainer component={Paper} className={classes.table}>
+            <TableContainer component={Paper} className={classes.tableContainer}>
                 <Table aria-label="search results">
                 <TableHead>
                     <TableRow>
@@ -164,12 +273,21 @@ const SearchPage = () => {
                 </TableBody>
                 </Table>
             </TableContainer>
+            <Pagination
+              count={10} // Total number of pages
+              page={page}
+              onChange={handleChangePage}
+              color="primary"
+              showFirstButton
+              showLastButton
+            />
             <div className={classes.inquirySection}>
                 <TextField
                 className={classes.inquiryInput}
                 label="문의 입력 ..."
                 variant="outlined"
                 value={inquiry}
+                multiline
                 onChange={handleInquiryChange}
                 />
                 <Button
