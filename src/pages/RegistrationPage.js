@@ -24,7 +24,7 @@
 // };
 
 // export default RegistrationPage;
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TextField, Button, makeStyles } from '@material-ui/core';
 
@@ -84,9 +84,37 @@ const RegistrationPage = () => {
   const classes = useStyles();
   const navigate = useNavigate();
 
-  const handleRegister = () => {
-    // Perform registration logic
-    navigate('/search');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState('');
+
+  const handleRegister = async () => {
+    const registrationData = {
+      username: username,
+      password: password,
+      email: email
+    };
+
+    try {
+      const response = await fetch('http://15.164.204.220:4545/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(registrationData)
+      });
+
+      if (response.ok) {
+        // Registration successful
+        navigate('/');
+      } else {
+        console.error('Registration failed');
+        // Handle registration failure (show error message)
+      }
+    } catch (error) {
+      console.error('There was an error during registration', error);
+      // Handle server error (show error message)
+    }
   };
 
   const logoClick = () => {
@@ -100,7 +128,7 @@ const RegistrationPage = () => {
         <div className={classes.header}>
           <img src="https://www.yigam.co.kr/img/logo_210517d.jpg" alt="Logo" className={classes.logo} onClick={() => logoClick()}/>
           <div>
-            <span className={classes.navLink} onClick={() => navigate('/login')}>로그인</span>
+            <span className={classes.navLink} onClick={() => navigate('/')}>로그인</span>
             <span className={classes.navLink} onClick={() => navigate('/search')}>검색페이지</span>
           </div>
         </div>
@@ -110,6 +138,8 @@ const RegistrationPage = () => {
             variant="outlined"
             fullWidth
             className={classes.textField}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
           />
           <TextField
             label="비밀번호..."
@@ -117,12 +147,16 @@ const RegistrationPage = () => {
             variant="outlined"
             fullWidth
             className={classes.textField}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
           />
           <TextField
             label="닉네임..."
             variant="outlined"
             fullWidth
             className={classes.textField}
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
           />
           <Button
             variant="contained"

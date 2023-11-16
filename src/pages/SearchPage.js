@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Pagination from '@material-ui/lab/Pagination';
 import {
@@ -18,7 +18,8 @@ import {
   TablePagination
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-// import MuiAlert from '@material-ui/lab/Alert';
+import verifyUser from '../utils/verifyuser';
+import { Alert } from '@material-ui/lab';
 
 const useStyles = makeStyles((theme) => ({
   pageContainer: {
@@ -169,12 +170,38 @@ const useStyles = makeStyles((theme) => ({
 const SearchPage = () => {
   const classes = useStyles();
   const [searchResults, setSearchResults] = useState([]);
-  const [inquiry, setInquiry] = useState('');
   const [open, setOpen] = useState(false);
+
+  const [inquiry, setInquiry] = useState('');
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+
   const navigate = useNavigate();
 
   // State for current page
   const [page, setPage] = useState(1);
+
+
+  useEffect(() => {
+    const checkUser = async () => {
+      const access_token = localStorage.getItem('access_token');
+      if (!access_token){
+        navigate('/');
+      } else {
+        const result = await verifyUser(access_token);
+        if (!result){
+          navigate('/');
+        } else {
+          if (result.email === null){
+            navigate('/');
+          }
+        }
+      }
+
+    };
+
+    checkUser();
+  }, [navigate]);
 
   // Handle change page
   const handleChangePage = (event, newPage) => {
@@ -192,10 +219,46 @@ const SearchPage = () => {
     setInquiry(event.target.value);
   };
 
-  const handleSendInquiry = () => {
-    // Here, you would add your logic to send the inquiry.
-    setOpen(true);
-    setInquiry('');
+  const handleSendInquiry = async () => {
+    const access_token = localStorage.getItem('access_token');
+    if (!access_token) {
+      // Handle the case where there is no access token
+      alert('로그인이 필요합니다.');
+      return;
+    }
+
+    const inquiryData = {
+      access_token: access_token,
+      question: inquiry
+    };
+
+    try {
+      const response = await fetch('http://15.164.204.220:4545/inquiry', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(inquiryData)
+      });
+
+      if (response.status === 201) {
+        setSnackbarMessage('문의 신청이 완료 되었습니다. 곧 관리자가 이메일로 답변을 드리겠습니다.');
+        setOpenSnackbar(true);
+        setInquiry(''); // Clear the inquiry input
+      } else {
+        // Handle other response statuses (e.g., error cases)
+        setSnackbarMessage('문의 전송에 실패했습니다.');
+        setOpenSnackbar(true);
+      }
+    } catch (error) {
+      console.error('Error sending inquiry', error);
+      setSnackbarMessage('서버 오류로 문의 전송에 실패했습니다.');
+      setOpenSnackbar(true);
+    }
+  };
+
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false);
   };
 
   const handleClose = (event, reason) => {
@@ -206,6 +269,8 @@ const SearchPage = () => {
   };
   const handleLogout = () => {
     // Logic for logging out the user
+    localStorage.removeItem('access_token');
+    navigate('/');
   };
 
   const logoClick = () => {
@@ -219,7 +284,7 @@ const SearchPage = () => {
         <div className={classes.header}>
           <img src="https://www.yigam.co.kr/img/logo_210517d.jpg" alt="Logo" className={classes.logo} onClick={() => logoClick()}/>
           <div>
-            <span className={classes.navLink} onClick={() => navigate('/login')}>로그아웃</span>
+            <span className={classes.navLink} onClick={handleLogout}>로그아웃</span>
             <span className={classes.navLink} onClick={() => navigate('/search')}>검색페이지</span>
           </div>
         </div>
@@ -298,10 +363,14 @@ const SearchPage = () => {
                 문의하기
                 </Button>
             </div>
-            <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
-                {/* <Alert onClose={handleClose} severity="success">
-                Your inquiry has been sent!
-                </Alert> */}
+            <Snackbar 
+              open={openSnackbar} 
+              autoHideDuration={6000} 
+              onClose={handleCloseSnackbar}
+            >
+              <Alert onClose={handleCloseSnackbar} severity="success">
+                {snackbarMessage}
+              </Alert>
             </Snackbar>
         </div>
     </div>

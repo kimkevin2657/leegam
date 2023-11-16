@@ -26,9 +26,10 @@
 
 // export default LoginPage;
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TextField, Button, makeStyles } from '@material-ui/core';
+import verifyUser from '../utils/verifyuser';
 
 // Styles defined using makeStyles
 const useStyles = makeStyles((theme) => ({
@@ -101,11 +102,55 @@ const useStyles = makeStyles((theme) => ({
 const LoginPage = () => {
   const classes = useStyles();
   const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
-  const handleLogin = () => {
+
+  useEffect(() => {
+    const checkUser = async () => {
+      const access_token = localStorage.getItem('access_token');
+      if (access_token) {
+        const result = await verifyUser(access_token);
+        if (result.email) {
+          navigate('/search');
+        } 
+      }
+    };
+
+    checkUser();
+  }, [navigate]);
+
+
+  const handleLogin = async () => {
     // Perform login logic
     // https://www.yigam.co.kr/img/logo_210517d.jpg
-    navigate('/search');
+    // navigate('/search');
+    const loginData = {
+      email: email,
+      password: password
+    };
+    try {
+      const response = await fetch('http://15.164.204.220:4545/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(loginData)
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        // Save the access_token in local storage
+        localStorage.setItem('access_token', data.access_token);
+        navigate('/search');
+      } else {
+        console.error('Login failed');
+        // Handle login failure (show error message)
+      }
+    } catch (error) {
+      console.error('There was an error logging in', error);
+      // Handle server error (show error message)
+    }
   };
 
   const logoClick = () => {
@@ -121,7 +166,7 @@ const LoginPage = () => {
         <div className={classes.header}>
           <img src="https://www.yigam.co.kr/img/logo_210517d.jpg" alt="Logo" className={classes.logo} onClick={() => logoClick()}/>
           <div>
-            <span className={classes.navLink} onClick={() => navigate('/login')}>로그인</span>
+            <span className={classes.navLink} onClick={() => navigate('/')}>로그인</span>
             <span className={classes.navLink} onClick={() => navigate('/search')}>검색페이지</span>
           </div>
         </div>
@@ -131,6 +176,8 @@ const LoginPage = () => {
           variant="outlined"
           fullWidth
           className={classes.textField}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
         />
         <TextField
           label="비밀번호..."
@@ -138,6 +185,8 @@ const LoginPage = () => {
           variant="outlined"
           fullWidth
           className={classes.textField}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
         />
         <Button
           variant="contained"
