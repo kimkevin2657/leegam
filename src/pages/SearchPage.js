@@ -148,19 +148,36 @@ const useStyles = makeStyles((theme) => ({
   logoutButton: {
     marginRight: theme.spacing(2),
   },
+  // tableRow: {
+  //   '& > *': {  // Targets all TableCell components within the TableRow
+  //     paddingTop: theme.spacing(3),  // Add padding to the top of the cell
+  //     paddingBottom: theme.spacing(3),  // Add padding to the bottom of the cell
+  //   },
+  // },
   tableRow: {
-    '& > *': {  // Targets all TableCell components within the TableRow
-      paddingTop: theme.spacing(3),  // Add padding to the top of the cell
-      paddingBottom: theme.spacing(3),  // Add padding to the bottom of the cell
+    '& > *': {
+      width: '50%', // Equal width for both cells
+      paddingTop: theme.spacing(3),
+      paddingBottom: theme.spacing(3),
     },
   },
+  // tableContainer: {
+  //   width: '100%',
+  //   margin: 'auto', // Center align the table
+  //   [theme.breakpoints.up('md')]: {
+  //     width: '60%',
+  //   },
+  //   marginTop: theme.spacing(2),
+  // },
   tableContainer: {
-    width: '100%',
-    margin: 'auto', // Center align the table
+    width: '100%', // Double the width
+    margin: 'auto',
     [theme.breakpoints.up('md')]: {
-      width: '60%',
+      width: '100%', // Adjusted width on medium devices and up
     },
     marginTop: theme.spacing(2),
+    marginLeft: 'auto',
+    marginRight: 'auto',
   },
 
 }));
@@ -169,7 +186,8 @@ const useStyles = makeStyles((theme) => ({
 
 const SearchPage = () => {
   const classes = useStyles();
-  const [searchResults, setSearchResults] = useState([]);
+  const [searchResults, setSearchResults] = useState([
+  ]);
   const [open, setOpen] = useState(false);
 
   const [inquiry, setInquiry] = useState('');
@@ -178,9 +196,14 @@ const SearchPage = () => {
 
   const navigate = useNavigate();
 
+  const rowsPerPage = 20; 
+  const count = Math.ceil(searchResults.length / rowsPerPage);
   // State for current page
   const [page, setPage] = useState(1);
-
+  
+  const [showResults, setShowResults] = useState(false); // New state to control the display of the table
+  const [query, setQuery] = useState('');
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     const checkUser = async () => {
@@ -197,7 +220,20 @@ const SearchPage = () => {
           }
         }
       }
+      const response = await fetch('http://141.164.63.217:4545/verifyadmin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({access_token: access_token})
+      });
 
+      if (response.status === 200) {
+        const responseJson = await response.json();
+        if (responseJson.status === "admin"){
+          setIsAdmin(true);
+        }
+      };
     };
 
     checkUser();
@@ -209,10 +245,31 @@ const SearchPage = () => {
     // Additional logic to load data for the new page
   };
 
-  const handleSearch = (event) => {
+  const handleSearch = async (event) => {
     event.preventDefault();
-    // Here, you would add your search logic and update the searchResults state.
-    setSearchResults([]); // Replace with actual search result
+    try {
+      const response = await fetch('http://141.164.63.217:4545/getranking', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ query })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setSearchResults(data.ranking);
+        setShowResults(true); // Show the table with results
+      } else {
+        // Handle non-200 responses
+        setSnackbarMessage('검색 결과를 가져오는 데 실패했습니다.');
+        setOpenSnackbar(true);
+      }
+    } catch (error) {
+      console.error('Search request failed', error);
+      setSnackbarMessage('서버 오류로 검색 요청에 실패했습니다.');
+      setOpenSnackbar(true);
+    }
   };
 
   const handleInquiryChange = (event) => {
@@ -285,7 +342,11 @@ const SearchPage = () => {
           <img src="https://www.yigam.co.kr/img/logo_210517d.jpg" alt="Logo" className={classes.logo} onClick={() => logoClick()}/>
           <div>
             <span className={classes.navLink} onClick={handleLogout}>로그아웃</span>
-            <span className={classes.navLink} onClick={() => navigate('/search')}>검색페이지</span>
+            {isAdmin ? 
+              <span className={classes.navLink} onClick={() => navigate('/inquiry')}>문의보기</span>
+              :
+              <span className={classes.navLink} onClick={() => navigate('/search')}>검색페이지</span>
+            }
           </div>
         </div>
         <div className={classes.searchContainer}>
@@ -300,52 +361,40 @@ const SearchPage = () => {
                 검색하기
                 </Button>
             </form>
-            <TableContainer component={Paper} className={classes.tableContainer}>
-                <Table aria-label="search results">
-                <TableHead>
-                    <TableRow>
-                        <TableCell>질문</TableCell>
-                        <TableCell>질문 내용 샘플</TableCell>
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {/* Render search results here */}
-                    {/* Example static row */}
-                    <TableRow className={classes.tableRow}>
-                        <TableCell>답변 1</TableCell>
-                        <TableCell>답변 내용 1</TableCell>
-                    </TableRow>
-                    <TableRow className={classes.tableRow}>
-                        <TableCell>답변 2</TableCell>
-                        <TableCell>답변 내용 2</TableCell>
-                    </TableRow>
-                    <TableRow className={classes.tableRow}>
-                        <TableCell>답변 3</TableCell>
-                        <TableCell>답변 내용 3</TableCell>
-                    </TableRow>
-                    <TableRow className={classes.tableRow}>
-                        <TableCell>답변 4</TableCell>
-                        <TableCell>답변 내용 4</TableCell>
-                    </TableRow>
-                    <TableRow className={classes.tableRow}>
-                        <TableCell>답변 5</TableCell>
-                        <TableCell>답변 내용 5</TableCell>
-                    </TableRow>
-                    <TableRow className={classes.tableRow}>
-                        <TableCell>답변 6</TableCell>
-                        <TableCell>답변 내용 6</TableCell>
-                    </TableRow>
-                </TableBody>
-                </Table>
-            </TableContainer>
-            <Pagination
-              count={10} // Total number of pages
-              page={page}
-              onChange={handleChangePage}
-              color="primary"
-              showFirstButton
-              showLastButton
-            />
+            {showResults &&  (
+              <>
+                  <TableContainer component={Paper} className={classes.tableContainer}>
+                    <Table aria-label="search results">
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>질문</TableCell>
+                            <TableCell>답변 내용</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {/* Render search results here */}
+                        {/* Example static row */}
+                        {searchResults
+                          .slice((page - 1) * rowsPerPage, page * rowsPerPage)
+                          .map((result, index) => (
+                          <TableRow key={index} className={classes.tableRow}>
+                              <TableCell>{result[0]}</TableCell>
+                              <TableCell>{result[1]}</TableCell>
+                          </TableRow>
+                        ))}
+                    </TableBody>
+                    </Table>
+                </TableContainer>
+                <Pagination
+                  count={10} // Total number of pages
+                  page={page}
+                  onChange={(event, newPage) => setPage(newPage)}
+                  color="primary"
+                  showFirstButton
+                  showLastButton
+                />
+              </>
+            )}
             <div className={classes.inquirySection}>
                 <TextField
                 className={classes.inquiryInput}

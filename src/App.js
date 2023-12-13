@@ -28,6 +28,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import RegistrationPage from './pages/RegistrationPage';
 import SearchPage from './pages/SearchPage';
+import InquiryTable from './pages/admin';
 import './App.css'; // This will be your global CSS file
 
 const App = () => {
@@ -37,6 +38,7 @@ const App = () => {
         <Route path="/" element={<LoginPage />} />
         <Route path="/register" element={<RegistrationPage />} />
         <Route path="/search" element={<SearchPage />} />
+        <Route path="/inquiry" element={<InquiryTable />} />
       </Routes>
     </Router>
   );
