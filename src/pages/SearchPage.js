@@ -15,7 +15,8 @@ import {
   AppBar,
   Toolbar,
   Typography,
-  TablePagination
+  TablePagination,
+  CircularProgress
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import verifyUser from '../utils/verifyuser';
@@ -83,6 +84,13 @@ const useStyles = makeStyles((theme) => ({
   //   backgroundColor: '#f5f5f5',
   //   minHeight: '100vh',
   // },
+  loadingContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: theme.spacing(2),
+  },
   searchContainer: {
     padding: theme.spacing(2),
     textAlign: 'center',
@@ -188,6 +196,8 @@ const SearchPage = () => {
   const classes = useStyles();
   const [searchResults, setSearchResults] = useState([
   ]);
+  const [loading, setLoading] = useState(false); // State to manage loading status
+
   const [open, setOpen] = useState(false);
 
   const [inquiry, setInquiry] = useState('');
@@ -237,7 +247,7 @@ const SearchPage = () => {
     };
 
     checkUser();
-  }, [navigate]);
+  }, [navigate, searchResults]);
 
   // Handle change page
   const handleChangePage = (event, newPage) => {
@@ -247,6 +257,7 @@ const SearchPage = () => {
 
   const handleSearch = async (event) => {
     event.preventDefault();
+    setLoading(true);
     try {
       const response = await fetch('http://141.164.63.217:4545/getranking', {
         method: 'POST',
@@ -269,6 +280,8 @@ const SearchPage = () => {
       console.error('Search request failed', error);
       setSnackbarMessage('서버 오류로 검색 요청에 실패했습니다.');
       setOpenSnackbar(true);
+    } finally {
+      setLoading(false); // Set loading to false after fetch
     }
   };
 
@@ -361,38 +374,47 @@ const SearchPage = () => {
                 검색하기
                 </Button>
             </form>
-            {showResults &&  (
+            {loading ? (
+              <div className={classes.loadingContainer}>
+                <CircularProgress />
+                <Typography variant="h6">AI 모델이 검색 중입니다. 잠시만 기다려주세요</Typography>
+              </div>
+            ) : (
               <>
-                  <TableContainer component={Paper} className={classes.tableContainer}>
-                    <Table aria-label="search results">
-                    <TableHead>
-                        <TableRow>
-                            <TableCell>질문</TableCell>
-                            <TableCell>답변 내용</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {/* Render search results here */}
-                        {/* Example static row */}
-                        {searchResults
-                          .slice((page - 1) * rowsPerPage, page * rowsPerPage)
-                          .map((result, index) => (
-                          <TableRow key={index} className={classes.tableRow}>
-                              <TableCell>{result[0]}</TableCell>
-                              <TableCell>{result[1]}</TableCell>
-                          </TableRow>
-                        ))}
-                    </TableBody>
-                    </Table>
-                </TableContainer>
-                <Pagination
-                  count={10} // Total number of pages
-                  page={page}
-                  onChange={(event, newPage) => setPage(newPage)}
-                  color="primary"
-                  showFirstButton
-                  showLastButton
-                />
+                  {showResults &&  (
+                    <>
+                        <TableContainer component={Paper} className={classes.tableContainer}>
+                          <Table aria-label="search results">
+                          <TableHead>
+                              <TableRow>
+                                  <TableCell>질문</TableCell>
+                                  <TableCell>답변 내용</TableCell>
+                              </TableRow>
+                          </TableHead>
+                          <TableBody>
+                              {/* Render search results here */}
+                              {/* Example static row */}
+                              {searchResults
+                                .slice((page - 1) * rowsPerPage, page * rowsPerPage)
+                                .map((result, index) => (
+                                <TableRow key={index} className={classes.tableRow}>
+                                    <TableCell>{result[0]}</TableCell>
+                                    <TableCell>{result[1]}</TableCell>
+                                </TableRow>
+                              ))}
+                          </TableBody>
+                          </Table>
+                      </TableContainer>
+                      <Pagination
+                        count={10} // Total number of pages
+                        page={page}
+                        onChange={(event, newPage) => setPage(newPage)}
+                        color="primary"
+                        showFirstButton
+                        showLastButton
+                      />
+                    </>
+                  )}
               </>
             )}
             <div className={classes.inquirySection}>
