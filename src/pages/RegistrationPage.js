@@ -88,7 +88,16 @@ const RegistrationPage = () => {
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
 
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [usernameError, setUsernameError] = useState('');
+
+
   const handleRegister = async () => {
+    if (!validateInputs()) {
+      // Stop the registration process if validation fails
+      return;
+    }
     const registrationData = {
       username: username,
       password: password,
@@ -123,6 +132,38 @@ const RegistrationPage = () => {
     navigate('/');
   };
 
+  const validateInputs = () => {
+    let isValid = true;
+  
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setEmailError('유효하지 않은 이메일입니다.');
+      isValid = false;
+    } else {
+      setEmailError('');
+    }
+  
+    // Password validation (example: minimum 8 characters)
+    if (password.length < 8) {
+      setPasswordError('비밀번호는 최소 8자리 이상입니다.');
+      isValid = false;
+    } else {
+      setPasswordError('');
+    }
+  
+    // Username validation (example: non-empty)
+    if (!username.trim()) {
+      setUsernameError('닉네임은 필수입니다.');
+      isValid = false;
+    } else {
+      setUsernameError('');
+    }
+  
+    return isValid;
+  };
+  
+
   return (
     <div>
         <div className={classes.header}>
@@ -140,6 +181,8 @@ const RegistrationPage = () => {
             className={classes.textField}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            error={!!emailError}
+            helperText={emailError}
           />
           <TextField
             label="비밀번호..."
@@ -149,6 +192,8 @@ const RegistrationPage = () => {
             className={classes.textField}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            error={!!passwordError}
+            helperText={passwordError}
           />
           <TextField
             label="닉네임..."
@@ -157,6 +202,8 @@ const RegistrationPage = () => {
             className={classes.textField}
             value={username}
             onChange={(e) => setUsername(e.target.value)}
+            error={!!usernameError}
+            helperText={usernameError}
           />
           <Button
             variant="contained"

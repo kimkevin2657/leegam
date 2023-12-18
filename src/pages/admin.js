@@ -14,6 +14,9 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import { useNavigate } from 'react-router-dom';
 import verifyUser from '../utils/verifyuser';
+import Header from './Header'; // Adjust the path as needed
+import GetAppIcon from '@mui/icons-material/GetApp'; // This is an example, replace with your preferred icon
+
 
 const useStyles = makeStyles({
   table: {
@@ -82,6 +85,7 @@ export default function InquiryTable() {
     fetch('http://141.164.63.217:4545/handleinquiry')
       .then(response => response.json())
       .then(data => {
+        console.log("!!!========== raw data from backend    ", data.result);
         const formattedRows = data.result.map(inquiry => ({
           id: inquiry.id,
           email: inquiry.email,
@@ -89,6 +93,7 @@ export default function InquiryTable() {
           status: inquiry.answertime === null ? "대기중" : "완료"
         }));
         setRows(formattedRows);
+        console.log("!!!========== formattedRows   ", formattedRows)
       })
       .catch(error => console.error('Error fetching inquiries:', error));
   }, []);
@@ -106,11 +111,12 @@ export default function InquiryTable() {
     const newStatus = event.target.value;
     setRows(rows.map((row) => (row.id === id ? { ...row, status: newStatus } : row)));
 
+    console.log("!!!========= newrows ", rows,  "    ", id, "    ", event.target.value);
     if (newStatus === "완료") {
       fetch('http://141.164.63.217:4545/modifyinquiry', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: id })
+        body: JSON.stringify({ id: id, target: event.target.value })
       }).then(response => {
         if (response.status === 200) {
           console.log('Status updated successfully');
@@ -120,6 +126,25 @@ export default function InquiryTable() {
       }).catch(error => console.error('Error updating status:', error));
     }
   };
+
+  const handleDownload = () => {
+    const csvRows = [
+      ['문의자 이메일', '문의 내용', '문의 상태'], // headers
+      ...rows.map(row => [row.email, row.content, row.status]), // data
+    ];
+  
+    const csvContent = "data:text/csv;charset=utf-8," + 
+        csvRows.map(e => e.join(",")).join("\n");
+  
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "inquiries.csv");
+    document.body.appendChild(link); // Required for FF
+  
+    link.click(); // This will download the data file named "inquiries.csv".
+  };
+  
 
   const handleDelete = (id) => {
     fetch('http://141.164.63.217:4545/handleinquiry', {
@@ -136,52 +161,61 @@ export default function InquiryTable() {
     }
 
   return (
-    <Paper>
-      <TableContainer component={Paper}>
-        <Table className={classes.table} aria-label="simple table">
-          <TableHead>
-            <TableRow>
-              <TableCell>문의자 이메일</TableCell>
-              <TableCell>문의 내용</TableCell>
-              <TableCell>문의 상태</TableCell>
-              <TableCell align="right">상태 설정</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
-              <TableRow key={row.id}>
-                <TableCell component="th" scope="row">
-                  {row.email}
-                </TableCell>
-                <TableCell>{row.content}</TableCell>
-                <TableCell>
-                  <Select
-                    value={row.status}
-                    onChange={(event) => handleStatusChange(row.id, event)}
-                  >
-                    <MenuItem value="Pending">대기</MenuItem>
-                    <MenuItem value="Finished">완료</MenuItem>
-                  </Select>
-                </TableCell>
+    <div>
+      <Header isAdmin={isAdmin} />
+      <Paper>
+        <TableContainer component={Paper}>
+          <Table className={classes.table} aria-label="simple table">
+            <TableHead>
+              <TableRow>
+                <TableCell>문의자 이메일</TableCell>
+                <TableCell>문의 내용</TableCell>
+                <TableCell>문의 상태</TableCell>
+                <TableCell align="right">상태 설정</TableCell>
                 <TableCell align="right">
-                  <IconButton onClick={() => handleDelete(row.id)}>
-                    <DeleteIcon />
-                  </IconButton>
-                </TableCell>
+                <IconButton onClick={handleDownload}>
+                  <b style={{fontSize: 15}}>엑셀 다운로드</b>
+                  <GetAppIcon />
+                </IconButton>
+              </TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <TablePagination
-        rowsPerPageOptions={[5, 10, 25]}
-        component="div"
-        count={rows.length}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        onPageChange={handleChangePage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-      />
-    </Paper>
+            </TableHead>
+            <TableBody>
+              {rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
+                <TableRow key={row.id}>
+                  <TableCell component="th" scope="row">
+                    {row.email}
+                  </TableCell>
+                  <TableCell>{row.content}</TableCell>
+                  <TableCell>
+                    <Select
+                      value={row.status}
+                      onChange={(event) => handleStatusChange(row.id, event)}
+                    >
+                      <MenuItem value="대기중">대기</MenuItem>
+                      <MenuItem value="완료">완료</MenuItem>
+                    </Select>
+                  </TableCell>
+                  <TableCell align="right">
+                    <IconButton onClick={() => handleDelete(row.id)}>
+                      <DeleteIcon />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        <TablePagination
+          rowsPerPageOptions={[5, 10, 25]}
+          component="div"
+          count={rows.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
+      </Paper>
+    </div>
   );
 }

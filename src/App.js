@@ -29,6 +29,9 @@ import LoginPage from './pages/LoginPage';
 import RegistrationPage from './pages/RegistrationPage';
 import SearchPage from './pages/SearchPage';
 import InquiryTable from './pages/admin';
+import UserTable from './pages/users';
+import SearchHistoryTable from './pages/Searches';
+
 import './App.css'; // This will be your global CSS file
 
 const App = () => {
@@ -39,6 +42,8 @@ const App = () => {
         <Route path="/register" element={<RegistrationPage />} />
         <Route path="/search" element={<SearchPage />} />
         <Route path="/inquiry" element={<InquiryTable />} />
+        <Route path="/users" element={<UserTable />} />
+        <Route path="/searches" element={<SearchHistoryTable />} />
       </Routes>
     </Router>
   );

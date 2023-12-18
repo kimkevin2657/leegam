@@ -105,6 +105,10 @@ const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+
+
 
   useEffect(() => {
     const checkUser = async () => {
@@ -120,8 +124,38 @@ const LoginPage = () => {
     checkUser();
   }, [navigate]);
 
+  const validateInputs = () => {
+    let isValid = true;
+  
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setEmailError('유효하지 않은 이메일입니다.');
+      isValid = false;
+    } else {
+      setEmailError('');
+    }
+  
+    // Password validation (example: minimum 8 characters)
+    if (password.length < 8) {
+      setPasswordError('비밀번호는 최소 8자리 이상입니다.');
+      isValid = false;
+    } else {
+      setPasswordError('');
+    }
+  
+    return isValid;
+  };
+  
+
 
   const handleLogin = async () => {
+
+    if (!validateInputs()) {
+      console.log("!!!================= EmailError  ", emailError, "    ", passwordError);
+      // Stop the registration process if validation fails
+      return;
+    }
     // Perform login logic
     // https://www.yigam.co.kr/img/logo_210517d.jpg
     // navigate('/search');
@@ -178,6 +212,8 @@ const LoginPage = () => {
           className={classes.textField}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          error={!!emailError}
+          helperText={emailError}
         />
         <TextField
           label="비밀번호..."
@@ -187,6 +223,8 @@ const LoginPage = () => {
           className={classes.textField}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          error={!!passwordError}
+          helperText={passwordError}
         />
         <Button
           variant="contained"

@@ -187,6 +187,16 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: 'auto',
     marginRight: 'auto',
   },
+  numberCell: {
+    width: '20%', // Width for the "번호" cell
+  },
+  contentCell: {
+    width: '60%', // Width for the "답변 내용" cell
+  },
+  scoreCell: {
+    width: '20%', // Width for the "정확도 수치" cell
+  },
+  
 
 }));
 
@@ -196,6 +206,9 @@ const SearchPage = () => {
   const classes = useStyles();
   const [searchResults, setSearchResults] = useState([
   ]);
+  const [score, setScore] = useState([]);
+  const [indices, setIndices] = useState([]);
+
   const [loading, setLoading] = useState(false); // State to manage loading status
 
   const [open, setOpen] = useState(false);
@@ -214,6 +227,14 @@ const SearchPage = () => {
   const [showResults, setShowResults] = useState(false); // New state to control the display of the table
   const [query, setQuery] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
+
+  const [inquiryError, setInquiryError] = useState('');
+
+
+  const [currentPageResults, setCurrentPageResults] = useState([]);
+  const [currentPageScores, setCurrentPageScores] = useState([]);
+  const [currentPageIndices, setCurrentPageIndices] = useState([]);
+
 
   useEffect(() => {
     const checkUser = async () => {
@@ -247,30 +268,63 @@ const SearchPage = () => {
     };
 
     checkUser();
-  }, [navigate, searchResults]);
+  }, [navigate, searchResults, page, currentPageResults, currentPageScores]);
 
-  // Handle change page
+  // // Handle change page
+  // const handleChangePage = (event, newPage) => {
+  //   setPage(newPage);
+  //   // Additional logic to load data for the new page
+  // };
   const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-    // Additional logic to load data for the new page
+    
+    setPage(newPage); // Update the current page
+    // No need to call the API again, just slice the current search results
+    const startIndex = (newPage - 1) * rowsPerPage;
+    const endIndex = startIndex + rowsPerPage;
+    const newPagedResults = searchResults.slice(startIndex, endIndex);
+    const newPagedScores = score.slice(startIndex, endIndex);
+    const newPagedIndices = indices.slice(startIndex, endIndex);
+  
+    console.log("!!========== handleChangePage   ", newPage, "   newdata ", newPagedResults);
+    // Update the state with the new slices for the current page
+    setCurrentPageResults(newPagedResults);
+    setCurrentPageScores(newPagedScores);
+    setCurrentPageIndices(newPagedIndices);
+    window.scrollTo(0,0);
   };
+  
+  // Add new state variables to hold the current page's data
+  
 
   const handleSearch = async (event) => {
     event.preventDefault();
     setLoading(true);
+    setPage(1)
     try {
+      const access_token = localStorage.getItem('access_token');
       const response = await fetch('http://141.164.63.217:4545/getranking', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ query })
+        body: JSON.stringify({ 
+          query: query,
+          access_token: access_token,
+          search_text: query
+         })
       });
 
       if (response.ok) {
         const data = await response.json();
         setSearchResults(data.ranking);
+        setScore(data.accuracy);
+        setIndices(data.indices);
         setShowResults(true); // Show the table with results
+
+        setCurrentPageResults(data.ranking.slice(0, rowsPerPage));
+        setCurrentPageScores(data.accuracy.slice(0, rowsPerPage));
+        setCurrentPageIndices(data.indices.slice(0, rowsPerPage));
+
       } else {
         // Handle non-200 responses
         setSnackbarMessage('검색 결과를 가져오는 데 실패했습니다.');
@@ -290,6 +344,12 @@ const SearchPage = () => {
   };
 
   const handleSendInquiry = async () => {
+    setInquiryError('');
+    if (inquiry.length < 10) {
+      setInquiryError('문의 내용은 최소 10자 이상이어야 합니다.');
+      return; // Stop the function if the validation fails
+    }
+
     const access_token = localStorage.getItem('access_token');
     if (!access_token) {
       // Handle the case where there is no access token
@@ -356,7 +416,7 @@ const SearchPage = () => {
           <div>
             <span className={classes.navLink} onClick={handleLogout}>로그아웃</span>
             {isAdmin ? 
-              <span className={classes.navLink} onClick={() => navigate('/inquiry')}>문의보기</span>
+              <span className={classes.navLink} onClick={() => navigate('/inquiry')}>관리자</span>
               :
               <span className={classes.navLink} onClick={() => navigate('/search')}>검색페이지</span>
             }
@@ -369,6 +429,8 @@ const SearchPage = () => {
                 variant="outlined"
                 placeholder="질문을 입력해주세요..."
                 fullWidth
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
                 />
                 <Button type="submit" variant="contained" color="primary">
                 검색하기
@@ -383,32 +445,38 @@ const SearchPage = () => {
               <>
                   {showResults &&  (
                     <>
-                        <TableContainer component={Paper} className={classes.tableContainer}>
+                        <TableContainer component={Paper} className={classes.tableContainer} key={page}>
                           <Table aria-label="search results">
                           <TableHead>
                               <TableRow>
-                                  <TableCell>질문</TableCell>
-                                  <TableCell>답변 내용</TableCell>
+                                  <TableCell className={classes.numberCell} >번호</TableCell>
+                                  <TableCell className={classes.contentcell} >답변 내용</TableCell>
+                                  <TableCell className={classes.scoreCell} >정확도 수치</TableCell>
                               </TableRow>
                           </TableHead>
+          
                           <TableBody>
-                              {/* Render search results here */}
-                              {/* Example static row */}
-                              {searchResults
-                                .slice((page - 1) * rowsPerPage, page * rowsPerPage)
-                                .map((result, index) => (
-                                <TableRow key={index} className={classes.tableRow}>
-                                    <TableCell>{result[0]}</TableCell>
-                                    <TableCell>{result[1]}</TableCell>
-                                </TableRow>
-                              ))}
+                            {currentPageResults.map((result, index) => (
+                              <TableRow key={index} className={classes.tableRow}>
+                                <TableCell className={classes.numberCell}>
+                                  {(page - 1) * rowsPerPage + index + 1}
+                                </TableCell>
+                                <TableCell className={classes.contentCell}>
+                                  {result} {/* Assuming result is the content */}
+                                </TableCell>
+                                <TableCell className={classes.scoreCell}>
+                                  {currentPageScores[index]} {/* Assuming score is an array with corresponding indices */}
+                                </TableCell>
+                              </TableRow>
+                            ))}
                           </TableBody>
+
                           </Table>
                       </TableContainer>
                       <Pagination
-                        count={10} // Total number of pages
+                        count={count} // Total number of pages
                         page={page}
-                        onChange={(event, newPage) => setPage(newPage)}
+                        onChange={handleChangePage}
                         color="primary"
                         showFirstButton
                         showLastButton
@@ -419,17 +487,19 @@ const SearchPage = () => {
             )}
             <div className={classes.inquirySection}>
                 <TextField
-                className={classes.inquiryInput}
-                label="문의 입력 ..."
-                variant="outlined"
-                value={inquiry}
-                multiline
-                onChange={handleInquiryChange}
+                  className={classes.inquiryInput}
+                  label="관리자에게 문의 주시면, 최대한 빠른 시일내에 이메일 답변 전달 드립니다."
+                  variant="outlined"
+                  value={inquiry} 
+                  multiline
+                  onChange={handleInquiryChange}
+                  error={!!inquiryError} // This will apply the error styling if there is an error message
+                  helperText={inquiryError} // This will display the error message
                 />
                 <Button
-                variant="contained"
-                color="secondary"
-                onClick={handleSendInquiry}
+                  variant="contained"
+                  color="secondary"
+                  onClick={handleSendInquiry}
                 >
                 문의하기
                 </Button>
