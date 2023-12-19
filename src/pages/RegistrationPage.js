@@ -113,16 +113,20 @@ const RegistrationPage = () => {
         body: JSON.stringify(registrationData)
       });
 
-      if (response.ok) {
-        // Registration successful
-        navigate('/');
+      if (response.status === 200 || response.status === 201) {
+        // Registration successful, navigate to login
+        navigate('/Login');
+      } else if (response.status === 409) {
+        // User already exists
+        alert('이미 존재하는 유저입니다.');
       } else {
-        console.error('Registration failed');
-        // Handle registration failure (show error message)
+        // Other server issues
+        alert('서버 이슈입니다. 관리자 문의 부탁드립니다.');
       }
     } catch (error) {
       console.error('There was an error during registration', error);
       // Handle server error (show error message)
+      alert('서버 이슈입니다. 관리자 문의 부탁드립니다.');
     }
   };
 
