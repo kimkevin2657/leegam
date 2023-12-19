@@ -130,7 +130,7 @@ const LoginPage = () => {
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      setEmailError('유효하지 않은 이메일입니다.');
+      setEmailError('Invalid email format');
       isValid = false;
     } else {
       setEmailError('');
@@ -138,7 +138,7 @@ const LoginPage = () => {
   
     // Password validation (example: minimum 8 characters)
     if (password.length < 8) {
-      setPasswordError('비밀번호는 최소 8자리 이상입니다.');
+      setPasswordError('Password must be at least 8 characters long');
       isValid = false;
     } else {
       setPasswordError('');
@@ -149,10 +149,10 @@ const LoginPage = () => {
   
 
 
-  const handleLogin = async () => {
-
+  const handleLogin = async (event) => {
+    event.preventDefault();
     if (!validateInputs()) {
-      console.log("!!!================= EmailError  ", emailError, "    ", passwordError);
+      console.log("!!!================= EmailError  ")
       // Stop the registration process if validation fails
       return;
     }
@@ -205,35 +205,38 @@ const LoginPage = () => {
           </div>
         </div>
         <div className={classes.loginContainer}>
-        <TextField
-          label="이메일..."
-          variant="outlined"
-          fullWidth
-          className={classes.textField}
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          error={!!emailError}
-          helperText={emailError}
-        />
-        <TextField
-          label="비밀번호..."
-          type="password"
-          variant="outlined"
-          fullWidth
-          className={classes.textField}
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          error={!!passwordError}
-          helperText={passwordError}
-        />
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleLogin}
-          className={`${classes.button} ${classes.containedPrimary}`}
-        >
-          로그인
-        </Button>
+        {/* <form onSubmit={handleLogin}> */}
+          <TextField
+            label="이메일..."
+            variant="outlined"
+            fullWidth
+            className={classes.textField}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            error={!!emailError}
+            helperText={emailError}
+          />
+          <TextField
+            label="비밀번호..."
+            type="password"
+            variant="outlined"
+            fullWidth
+            className={classes.textField}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            error={!!passwordError}
+            helperText={passwordError}
+          />
+          <Button
+            type='submit'
+            variant="contained"
+            color="primary"
+            onClick={handleLogin}
+            className={`${classes.button} ${classes.containedPrimary}`}
+          >
+            로그인
+          </Button>
+        {/* </form> */}
         <Button
           variant="text"
           onClick={() => navigate('/register')}

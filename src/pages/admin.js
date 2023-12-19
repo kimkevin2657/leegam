@@ -127,23 +127,45 @@ export default function InquiryTable() {
     }
   };
 
+  // const handleDownload = () => {
+  //   const csvRows = [
+  //     ['문의자 이메일', '문의 내용', '문의 상태'], // headers
+  //     ...rows.map(row => [row.email, row.content, row.status]), // data
+  //   ];
+  
+  //   const csvContent = "data:text/csv;charset=utf-8," + 
+  //       csvRows.map(e => e.join(",")).join("\n");
+  
+  //   const encodedUri = encodeURI(csvContent);
+  //   const link = document.createElement("a");
+  //   link.setAttribute("href", encodedUri);
+  //   link.setAttribute("download", "inquiries.csv");
+  //   document.body.appendChild(link); // Required for FF
+  
+  //   link.click(); // This will download the data file named "inquiries.csv".
+  // };
   const handleDownload = () => {
     const csvRows = [
       ['문의자 이메일', '문의 내용', '문의 상태'], // headers
       ...rows.map(row => [row.email, row.content, row.status]), // data
     ];
   
-    const csvContent = "data:text/csv;charset=utf-8," + 
-        csvRows.map(e => e.join(",")).join("\n");
+    const csvContent = "\uFEFF" + csvRows.map(e => e.join(",")).join("\n"); // Add BOM
   
-    const encodedUri = encodeURI(csvContent);
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+  
     const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
+    link.setAttribute("href", url);
     link.setAttribute("download", "inquiries.csv");
     document.body.appendChild(link); // Required for FF
   
     link.click(); // This will download the data file named "inquiries.csv".
+  
+    document.body.removeChild(link); // Clean up
+    URL.revokeObjectURL(url); // Free up storage--no longer needed.
   };
+  
   
 
   const handleDelete = (id) => {
