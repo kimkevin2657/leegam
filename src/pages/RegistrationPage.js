@@ -115,7 +115,7 @@ const RegistrationPage = () => {
 
       if (response.status === 200 || response.status === 201) {
         // Registration successful, navigate to login
-        navigate('/Login');
+        navigate('/');
       } else if (response.status === 409) {
         // User already exists
         alert('이미 존재하는 유저입니다.');

@@ -171,14 +171,16 @@ const LoginPage = () => {
         },
         body: JSON.stringify(loginData)
       });
-
-      if (response.ok) {
+      let msg = '';
+      if (response.status === 200 || response.status === 201) {
         const data = await response.json();
+        msg = data;
         // Save the access_token in local storage
         localStorage.setItem('access_token', data.access_token);
         navigate('/search');
       } else {
         console.error('Login failed');
+        alert(msg);
         // Handle login failure (show error message)
       }
     } catch (error) {
