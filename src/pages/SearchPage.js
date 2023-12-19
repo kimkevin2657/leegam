@@ -188,13 +188,15 @@ const useStyles = makeStyles((theme) => ({
     marginRight: 'auto',
   },
   numberCell: {
-    width: '20%', // Width for the "번호" cell
+    width: '10%', // Width for the "번호" cell
+    textAlign: 'center'
   },
   contentCell: {
-    width: '60%', // Width for the "답변 내용" cell
+    width: '40%', // Width for the "답변 내용" cell
   },
   scoreCell: {
-    width: '20%', // Width for the "정확도 수치" cell
+    width: '10%', // Width for the "정확도 수치" cell
+    textAlign: 'center'
   },
   
 
@@ -205,6 +207,8 @@ const useStyles = makeStyles((theme) => ({
 const SearchPage = () => {
   const classes = useStyles();
   const [searchResults, setSearchResults] = useState([
+  ]);
+  const [searchResultsAnswers, setSearchResultsAnswers] = useState([
   ]);
   const [score, setScore] = useState([]);
   const [indices, setIndices] = useState([]);
@@ -232,6 +236,7 @@ const SearchPage = () => {
 
 
   const [currentPageResults, setCurrentPageResults] = useState([]);
+  const [currentPageResultsAnswers, setCurrentPageResultsAnswers] = useState([]);
   const [currentPageScores, setCurrentPageScores] = useState([]);
   const [currentPageIndices, setCurrentPageIndices] = useState([]);
 
@@ -282,12 +287,14 @@ const SearchPage = () => {
     const startIndex = (newPage - 1) * rowsPerPage;
     const endIndex = startIndex + rowsPerPage;
     const newPagedResults = searchResults.slice(startIndex, endIndex);
+    const newPagedResultsAnswers = searchResultsAnswers.slice(startIndex, endIndex);
     const newPagedScores = score.slice(startIndex, endIndex);
     const newPagedIndices = indices.slice(startIndex, endIndex);
   
     console.log("!!========== handleChangePage   ", newPage, "   newdata ", newPagedResults);
     // Update the state with the new slices for the current page
     setCurrentPageResults(newPagedResults);
+    setCurrentPageResultsAnswers(newPagedResultsAnswers);
     setCurrentPageScores(newPagedScores);
     setCurrentPageIndices(newPagedIndices);
     window.scrollTo(0,0);
@@ -315,13 +322,17 @@ const SearchPage = () => {
       });
 
       if (response.ok) {
+        
         const data = await response.json();
-        setSearchResults(data.ranking);
+        console.log("!!!======== data   ", data);
+        setSearchResults(data.rankingQuestions);
+        setSearchResultsAnswers(data.rankingAnswers);
         setScore(data.accuracy);
         setIndices(data.indices);
         setShowResults(true); // Show the table with results
 
-        setCurrentPageResults(data.ranking.slice(0, rowsPerPage));
+        setCurrentPageResults(data.rankingQuestions.slice(0, rowsPerPage));
+        setCurrentPageResultsAnswers(data.rankingAnswers.slice(0, rowsPerPage));
         setCurrentPageScores(data.accuracy.slice(0, rowsPerPage));
         setCurrentPageIndices(data.indices.slice(0, rowsPerPage));
 
@@ -450,6 +461,7 @@ const SearchPage = () => {
                           <TableHead>
                               <TableRow>
                                   <TableCell className={classes.numberCell} >번호</TableCell>
+                                  <TableCell className={classes.contentcell} >질문 내용</TableCell>
                                   <TableCell className={classes.contentcell} >답변 내용</TableCell>
                                   <TableCell className={classes.scoreCell} >정확도 수치</TableCell>
                               </TableRow>
@@ -464,8 +476,11 @@ const SearchPage = () => {
                                 <TableCell className={classes.contentCell}>
                                   {result} {/* Assuming result is the content */}
                                 </TableCell>
+                                <TableCell className={classes.contentCell}>
+                                  {currentPageResultsAnswers[index]} {/* Assuming result is the content */}
+                                </TableCell>
                                 <TableCell className={classes.scoreCell}>
-                                  {currentPageScores[index]} {/* Assuming score is an array with corresponding indices */}
+                                  {Number.parseFloat(currentPageScores[index]).toFixed(2)} {/* Assuming score is an array with corresponding indices */}
                                 </TableCell>
                               </TableRow>
                             ))}
