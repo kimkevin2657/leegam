@@ -30,6 +30,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TextField, Button, makeStyles } from '@material-ui/core';
 import verifyUser from '../utils/verifyuser';
+import logoImage from '../leegam-logo-header.png';
 
 // Styles defined using makeStyles
 const useStyles = makeStyles((theme) => ({
@@ -204,7 +205,7 @@ const LoginPage = () => {
       <div className={classes.contentWrap}>
         {/* Header */}
         <div className={classes.header}>
-          <img src="https://www.yigam.co.kr/img/logo_210517d.jpg" alt="Logo" className={classes.logo} onClick={() => logoClick()}/>
+          <img src={logoImage} alt="Logo" className={classes.logo} onClick={() => logoClick()}/>
           <div>
             <span className={classes.navLink} onClick={() => navigate('/')}>로그인</span>
             <span className={classes.navLink} onClick={() => navigate('/search')}>검색페이지</span>

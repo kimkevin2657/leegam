@@ -21,6 +21,7 @@ import {
 import { makeStyles } from '@material-ui/core/styles';
 import verifyUser from '../utils/verifyuser';
 import { Alert } from '@material-ui/lab';
+import logoImage from '../leegam-logo-header.png';
 
 const useStyles = makeStyles((theme) => ({
   pageContainer: {
@@ -423,7 +424,7 @@ const SearchPage = () => {
   return (
     <div>
         <div className={classes.header}>
-          <img src="https://www.yigam.co.kr/img/logo_210517d.jpg" alt="Logo" className={classes.logo} onClick={() => logoClick()}/>
+          <img src={logoImage} alt="Logo" className={classes.logo} onClick={() => logoClick()}/>
           <div>
             <span className={classes.navLink} onClick={handleLogout}>로그아웃</span>
             {isAdmin ? 
