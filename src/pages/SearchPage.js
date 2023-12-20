@@ -273,7 +273,7 @@ const SearchPage = () => {
     };
 
     checkUser();
-  }, [navigate, searchResults, page, currentPageResults, currentPageScores]);
+  }, [navigate, searchResults, searchResultsAnswers, page, currentPageResults, currentPageScores]);
 
   // // Handle change page
   // const handleChangePage = (event, newPage) => {
@@ -474,7 +474,7 @@ const SearchPage = () => {
                                   {(page - 1) * rowsPerPage + index + 1}
                                 </TableCell>
                                 <TableCell className={classes.contentCell}>
-                                  {result} {/* Assuming result is the content */}
+                                  {currentPageResults[index]} {/* Assuming result is the content */}
                                 </TableCell>
                                 <TableCell className={classes.contentCell}>
                                   {currentPageResultsAnswers[index]} {/* Assuming result is the content */}

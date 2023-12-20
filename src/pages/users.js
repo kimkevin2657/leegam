@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@mui/styles';
 import {
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper,
-  TablePagination, IconButton
+  TablePagination, IconButton, Select, MenuItem
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Header from './Header'; // Adjust the path as needed
@@ -79,13 +79,38 @@ export default function UserTable() {
         const formattedRows = data.result.map(user => ({
             id: user.id,
             email: user.email,
-            username: user.username
+            username: user.username,
+            status: user.status
         }))
         setRows(formattedRows);
         console.log("!!!========== formattedRows   ", formattedRows)
       })
       .catch(error => console.error('Error fetching inquiries:', error));
   }, []);
+
+  const handleAdminChange = async (id, newAdminStatus) => {
+    // Make a POST request to change the admin status
+    const access_token = localStorage.getItem('access_token');
+    const response = await fetch('http://141.164.63.217:4545/admin', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ id: id, status: newAdminStatus }),
+    });
+
+    if (response.status === 200) {
+      // Update the 'admin' property for the corresponding row
+      setRows((prevRows) =>
+        prevRows.map((row) =>
+          row.id === id ? { ...row, admin: newAdminStatus } : row
+        )
+      );
+      window.location.reload();
+    } else {
+      console.error('Failed to update admin status');
+    }
+  };
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -123,6 +148,7 @@ export default function UserTable() {
                 <TableCell>ID 번호</TableCell>
                 <TableCell>닉네임</TableCell>
                 <TableCell>이메일</TableCell>
+                <TableCell>관리자</TableCell>
                 <TableCell align="right">삭제하기</TableCell>
               </TableRow>
             </TableHead>
@@ -134,6 +160,15 @@ export default function UserTable() {
                   </TableCell>
                   <TableCell>{row.username}</TableCell>
                   <TableCell>{row.email}</TableCell>
+                  <TableCell>
+                    <Select
+                      value={row.status}
+                      onChange={(e) => handleAdminChange(row.id, e.target.value)}
+                    >
+                      <MenuItem value="user">유저</MenuItem>
+                      <MenuItem value="admin">관리자</MenuItem>
+                    </Select>
+                  </TableCell>
                   <TableCell align="right">
                     <IconButton onClick={() => handleDelete(row.id)}>
                       <DeleteIcon />
