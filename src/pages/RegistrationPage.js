@@ -115,10 +115,13 @@ const RegistrationPage = () => {
 
       if (response.status === 200 || response.status === 201) {
         // Registration successful, navigate to login
+        alert('안녕하세요 '+ username + '님. 회원가입에 성공하였습니다');
         navigate('/');
       } else if (response.status === 409) {
         // User already exists
-        alert('이미 존재하는 유저입니다.');
+        alert('이미 존재하는 이메일입니다.');
+      } else if (response.status === 408){
+        alert('이미 존재하는 닉네임입니다.');
       } else {
         // Other server issues
         alert('서버 이슈입니다. 관리자 문의 부탁드립니다.');

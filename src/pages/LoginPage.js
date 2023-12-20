@@ -178,9 +178,13 @@ const LoginPage = () => {
         // Save the access_token in local storage
         localStorage.setItem('access_token', data.access_token);
         navigate('/search');
+      } else if (response.status === 409){
+        alert('존재하지 않는 이메일입니다');
+      } else if (response.status === 408){
+        alert('비밀번호가 틀렸습니다');
       } else {
         console.error('Login failed');
-        alert(msg);
+        alert('서버 이슈입니다. 관리자에 문의 부탁드립니다.');
         // Handle login failure (show error message)
       }
     } catch (error) {
