@@ -50,6 +50,7 @@ const Header = ({ isAdmin }) => {
                 <span className={classes.navLink} onClick={() => navigate('/users')}>유저관리</span>
                 <span className={classes.navLink} onClick={() => navigate('/inquiry')}>문의관리</span>
                 <span className={classes.navLink} onClick={() => navigate('/searches')}>검색내역</span>
+                <span className={classes.navLink} onClick={() => navigate('/modify')}>데이터 수정</span>
             </>
           :
           <span className={classes.navLink} onClick={() => navigate('/search')}>검색페이지</span>

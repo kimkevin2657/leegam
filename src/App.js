@@ -31,6 +31,7 @@ import SearchPage from './pages/SearchPage';
 import InquiryTable from './pages/admin';
 import UserTable from './pages/users';
 import SearchHistoryTable from './pages/Searches';
+import Modify from './pages/Modify';
 
 import './App.css'; // This will be your global CSS file
 
@@ -44,6 +45,7 @@ const App = () => {
         <Route path="/inquiry" element={<InquiryTable />} />
         <Route path="/users" element={<UserTable />} />
         <Route path="/searches" element={<SearchHistoryTable />} />
+        <Route path="/modify" element={<Modify />} />
       </Routes>
     </Router>
   );
