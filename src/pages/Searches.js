@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@mui/styles';
 import {
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper,
-  TablePagination
+  TablePagination, IconButton
 } from '@mui/material';
 import Header from './Header'; // Make sure to adjust the path as needed
 import { useNavigate } from 'react-router-dom';
 import verifyUser from '../utils/verifyuser';
+import GetAppIcon from '@mui/icons-material/GetApp'; 
 
 const useStyles = makeStyles({
   table: {
@@ -89,6 +90,28 @@ export default function SearchHistoryTable() {
     setPage(0);
   };
 
+  const handleDownload = () => {
+    const csvRows = [
+      ['닉네임', '이메일', '검색 쿼리', '검색 시간'], // headers
+      ...searchHistories.map(row => [row.username, row.email, row.searchQuery, row.queryTime]), // data
+    ];
+  
+    const csvContent = "\uFEFF" + csvRows.map(e => e.join(",")).join("\n"); // Add BOM
+  
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+  
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", "searches.csv");
+    document.body.appendChild(link); // Required for FF
+  
+    link.click(); // This will download the data file named "inquiries.csv".
+  
+    document.body.removeChild(link); // Clean up
+    URL.revokeObjectURL(url); // Free up storage--no longer needed.
+  };
+
   return (
     <div>
       <Header isAdmin={isAdmin}/> {/* Insert Header component */}
@@ -102,6 +125,10 @@ export default function SearchHistoryTable() {
                     <TableCell>유저 이메일</TableCell>
                     <TableCell className={classes.searchQueryCell}>검색 내용</TableCell>
                     <TableCell>검색 시간</TableCell> {/* New column for query time */}
+                    <IconButton onClick={handleDownload}>
+                      <b style={{fontSize: 15}}>엑셀 다운로드</b>
+                      <GetAppIcon />
+                    </IconButton>
                 </TableRow>
             </TableHead>
 
