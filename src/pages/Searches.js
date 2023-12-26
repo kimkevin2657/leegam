@@ -120,6 +120,9 @@ export default function SearchHistoryTable() {
           <Table className={classes.table} aria-label="simple table">
             <TableHead>
                 <TableRow>
+                  회원들의 검색 내역을 조회할 수 있습니다
+                </TableRow>
+                <TableRow>
                     <TableCell>유저 ID 번호</TableCell>
                     <TableCell>유저 닉네임</TableCell>
                     <TableCell>유저 이메일</TableCell>

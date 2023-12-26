@@ -190,16 +190,19 @@ export default function InquiryTable() {
           <Table className={classes.table} aria-label="simple table">
             <TableHead>
               <TableRow>
+                회원들이 문의한 내용을 확인하고, csv 형식으로 내려 받을 수 있습니다
+              </TableRow>
+              <TableRow>
                 <TableCell>문의자 이메일</TableCell>
                 <TableCell>문의 내용</TableCell>
                 <TableCell>문의 상태</TableCell>
                 <TableCell align="right">상태 설정</TableCell>
                 <TableCell align="right">
-                <IconButton onClick={handleDownload}>
-                  <b style={{fontSize: 15}}>엑셀 다운로드</b>
-                  <GetAppIcon />
-                </IconButton>
-              </TableCell>
+                  <IconButton onClick={handleDownload}>
+                    <b style={{fontSize: 15}}>엑셀 다운로드</b>
+                    <GetAppIcon />
+                  </IconButton>
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>

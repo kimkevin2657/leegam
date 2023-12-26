@@ -145,6 +145,9 @@ export default function UserTable() {
           <Table className={classes.table} aria-label="simple table">
             <TableHead>
               <TableRow>
+                현재 가입한 회원들의 정보가 게시되며, 관리자 권한을 부여할 수 있습니다
+              </TableRow>
+              <TableRow>
                 <TableCell>ID 번호</TableCell>
                 <TableCell>닉네임</TableCell>
                 <TableCell>이메일</TableCell>

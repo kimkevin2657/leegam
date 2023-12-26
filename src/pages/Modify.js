@@ -6,6 +6,10 @@ import GetAppIcon from '@mui/icons-material/GetApp';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { useNavigate } from 'react-router-dom';
 import verifyUser from '../utils/verifyuser';
+import {
+  Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
+  TablePagination
+} from '@mui/material';
 
 const useStyles = makeStyles({
   root: {
@@ -117,6 +121,9 @@ const Modify = () => {
       <Header isAdmin={isAdmin}/> {/* Insert Header component */}
 
       <Paper>
+        <TableRow>
+            백엔드에 갱신된 질의 데이터를 업로드하거나, 현재 사용되고 있는 최신 질의 데이터를 다운로드할 수 있습니다
+        </TableRow>
         <div className={classes.buttonContainer}>
             <div style={{height: 100}}></div>
           <IconButton onClick={handleDownload}>
