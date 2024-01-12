@@ -45,7 +45,7 @@ const Modify = () => {
           }
         }
       }
-      const response = await fetch('http://141.164.63.217:4545/verifyadmin', {
+      const response = await fetch('http://158.247.255.4:4545/verifyadmin', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -69,7 +69,7 @@ const Modify = () => {
   const handleDownload = async () => {
     try {
       // Make a GET request to download the .xlsx file
-      const response = await fetch('http://141.164.63.217:4545/modifyfile');
+      const response = await fetch('http://158.247.255.4:4545/modifyfile');
       const blob = await response.blob();
 
       // Create a Blob URL and trigger the download
@@ -100,7 +100,7 @@ const Modify = () => {
       formData.append('file', file);
 
       // Make a POST request to upload the file
-      const response = await fetch('http://141.164.63.217:4545/modifyfile', {
+      const response = await fetch('http://158.247.255.4:4545/modifyfile', {
         method: 'POST',
         body: formData,
       });

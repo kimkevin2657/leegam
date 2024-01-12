@@ -43,7 +43,7 @@ export default function SearchHistoryTable() {
           }
         }
       }
-      const response = await fetch('http://141.164.63.217:4545/verifyadmin', {
+      const response = await fetch('http://158.247.255.4:4545/verifyadmin', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -65,7 +65,7 @@ export default function SearchHistoryTable() {
   }, [navigate]);
 
   useEffect(() => {
-    fetch('http://141.164.63.217:4545/searchhistory') // Adjust the URL to your endpoint
+    fetch('http://158.247.255.4:4545/searchhistory') // Adjust the URL to your endpoint
       .then(response => response.json())
       .then(data => {
         const formattedRows = data.map(history => ({

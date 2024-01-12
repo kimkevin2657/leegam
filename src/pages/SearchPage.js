@@ -257,7 +257,7 @@ const SearchPage = () => {
           }
         }
       }
-      const response = await fetch('http://141.164.63.217:4545/verifyadmin', {
+      const response = await fetch('http://158.247.255.4:4545/verifyadmin', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -310,7 +310,7 @@ const SearchPage = () => {
     setPage(1)
     try {
       const access_token = localStorage.getItem('access_token');
-      const response = await fetch('http://141.164.63.217:4545/getranking', {
+      const response = await fetch('http://158.247.255.4:4545/getranking', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -375,7 +375,7 @@ const SearchPage = () => {
     };
 
     try {
-      const response = await fetch('http://141.164.63.217:4545/inquiry', {
+      const response = await fetch('http://158.247.255.4:4545/inquiry', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

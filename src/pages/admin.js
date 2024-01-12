@@ -60,7 +60,7 @@ export default function InquiryTable() {
           }
         }
       }
-      const response = await fetch('http://141.164.63.217:4545/verifyadmin', {
+      const response = await fetch('http://158.247.255.4:4545/verifyadmin', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -82,7 +82,7 @@ export default function InquiryTable() {
   }, [navigate]);
 
   useEffect(() => {
-    fetch('http://141.164.63.217:4545/handleinquiry')
+    fetch('http://158.247.255.4:4545/handleinquiry')
       .then(response => response.json())
       .then(data => {
         console.log("!!!========== raw data from backend    ", data.result);
@@ -113,7 +113,7 @@ export default function InquiryTable() {
 
     console.log("!!!========= newrows ", rows,  "    ", id, "    ", event.target.value);
     if (newStatus === "완료") {
-      fetch('http://141.164.63.217:4545/modifyinquiry', {
+      fetch('http://158.247.255.4:4545/modifyinquiry', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: id, target: event.target.value })
@@ -169,7 +169,7 @@ export default function InquiryTable() {
   
 
   const handleDelete = (id) => {
-    fetch('http://141.164.63.217:4545/handleinquiry', {
+    fetch('http://158.247.255.4:4545/handleinquiry', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: id })

@@ -165,7 +165,7 @@ const LoginPage = () => {
       password: password
     };
     try {
-      const response = await fetch('http://141.164.63.217:4545/login', {
+      const response = await fetch('http://158.247.255.4:4545/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

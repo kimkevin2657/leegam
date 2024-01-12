@@ -50,7 +50,7 @@ export default function UserTable() {
           }
         }
       }
-      const response = await fetch('http://141.164.63.217:4545/verifyadmin', {
+      const response = await fetch('http://158.247.255.4:4545/verifyadmin', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -72,7 +72,7 @@ export default function UserTable() {
   }, [navigate]);
 
   useEffect(() => {
-    fetch('http://141.164.63.217:4545/users')
+    fetch('http://158.247.255.4:4545/users')
       .then(response => response.json())
       .then(data => {
 
@@ -91,7 +91,7 @@ export default function UserTable() {
   const handleAdminChange = async (id, newAdminStatus) => {
     // Make a POST request to change the admin status
     const access_token = localStorage.getItem('access_token');
-    const response = await fetch('http://141.164.63.217:4545/admin', {
+    const response = await fetch('http://158.247.255.4:4545/admin', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -123,7 +123,7 @@ export default function UserTable() {
 
   const handleDelete = (id) => {
     // Delete logic (API call) and then update state
-    fetch('http://141.164.63.217:4545/users', {
+    fetch('http://158.247.255.4:4545/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: id })
