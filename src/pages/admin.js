@@ -16,6 +16,7 @@ import { useNavigate } from 'react-router-dom';
 import verifyUser from '../utils/verifyuser';
 import Header from './Header'; // Adjust the path as needed
 import GetAppIcon from '@mui/icons-material/GetApp'; // This is an example, replace with your preferred icon
+import Footer from './Footer';
 
 
 const useStyles = makeStyles({
@@ -25,6 +26,20 @@ const useStyles = makeStyles({
   visuallyHidden: {
     display: 'none',
   },
+  body: {
+    paddingTop: '66px',
+  },
+  tbody: {
+    display: 'block',
+    overflowY: 'scroll',
+    maxHeight: '80vh',
+  },
+  download: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  }
 });
 
 function createData(id, email, content, status) {
@@ -40,7 +55,7 @@ export default function InquiryTable() {
   const classes = useStyles();
   const [rows, setRows] = useState([]);
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(20);
+  const [rowsPerPage, setRowsPerPage] = useState(25);
   const navigate = useNavigate();
   const [isAdmin, setIsAdmin] = useState(false);
 
@@ -120,6 +135,7 @@ export default function InquiryTable() {
       }).then(response => {
         if (response.status === 200) {
           console.log('Status updated successfully');
+          alert('변경되었습니다.');
         } else {
           console.error('Failed to update status');
         }
@@ -169,6 +185,9 @@ export default function InquiryTable() {
   
 
   const handleDelete = (id) => {
+    if (!window.confirm('정말 삭제하시겠습니까?')) {
+      return;
+    }
     fetch('http://158.247.255.4:4545/handleinquiry', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -185,27 +204,33 @@ export default function InquiryTable() {
   return (
     <div>
       <Header isAdmin={isAdmin} />
-      <Paper>
+      <Paper className={classes.body}>
+        <div className={classes.download} align="right">
+          <div>
+            회원들이 문의한 내용을 확인하고, csv 형식으로 내려 받을 수 있습니다
+          </div>
+          <IconButton onClick={handleDownload}>
+            <b style={{fontSize: 15}}>엑셀 다운로드</b>
+            <GetAppIcon />
+          </IconButton>
+        </div>
         <TableContainer component={Paper}>
           <Table className={classes.table} aria-label="simple table">
             <TableHead>
-              <TableRow>
-                회원들이 문의한 내용을 확인하고, csv 형식으로 내려 받을 수 있습니다
-              </TableRow>
               <TableRow>
                 <TableCell>문의자 이메일</TableCell>
                 <TableCell>문의 내용</TableCell>
                 <TableCell>문의 상태</TableCell>
                 <TableCell align="right">상태 설정</TableCell>
-                <TableCell align="right">
+                {/* <TableCell align="right">
                   <IconButton onClick={handleDownload}>
                     <b style={{fontSize: 15}}>엑셀 다운로드</b>
                     <GetAppIcon />
                   </IconButton>
-                </TableCell>
+                </TableCell> */}
               </TableRow>
             </TableHead>
-            <TableBody>
+            <TableBody className={classes.tbody}>
               {rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
                 <TableRow key={row.id}>
                   <TableCell component="th" scope="row">
@@ -232,15 +257,19 @@ export default function InquiryTable() {
           </Table>
         </TableContainer>
         <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
+          rowsPerPageOptions={[]}
           component="div"
           count={rows.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
+          labelDisplayedRows={() => {
+            return `${page+1}-${Math.floor(rows.length / rowsPerPage)+1}`;
+          }}
         />
       </Paper>
+      <Footer />
     </div>
   );
 }

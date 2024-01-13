@@ -22,8 +22,12 @@ import { makeStyles } from '@material-ui/core/styles';
 import verifyUser from '../utils/verifyuser';
 import { Alert } from '@material-ui/lab';
 import logoImage from '../leegam-logo-header.png';
+import Footer from './Footer';
 
 const useStyles = makeStyles((theme) => ({
+  wrapper: {
+    position: 'relative',
+  },
   pageContainer: {
     display: 'flex',
     flexDirection: 'column',
@@ -44,6 +48,11 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: '#fff',
     padding: theme.spacing(1, 2),
     boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+    position: 'fixed',
+    top: 0,
+    width: '100%',
+    zIndex: '1',
+    boxSizing: 'border-box',
   },
   logo: {
     height: '50px',
@@ -101,6 +110,9 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: 'column',
     alignItems: 'center', // Center align children horizontally
     justifyContent: 'center', // Center align children vertically
+    paddingTop: '66px', // header padding
+    width: '100%',
+    height: 'auto',
   },
   searchBar: {
     margin: theme.spacing(2, 0),
@@ -122,24 +134,31 @@ const useStyles = makeStyles((theme) => ({
   inquirySection: {
     width: '100%',
     textAlign: 'center',
-    [theme.breakpoints.up('md')]: {
-      width: '60%',
-    },
+    // [theme.breakpoints.up('md')]: {
+    //   width: '60%',
+    // },
     margin: theme.spacing(2, 0),
     display: 'flex',
-    flexDirection: 'column',
+    flexDirection: 'row',
     alignItems: 'center', // Aligns children (TextField and Button) in the center
+    justifyContent: 'center',
   },
   inquiryInput: {
-    width: '100%', // Takes full width of its parent (inquirySection)
-    marginBottom: theme.spacing(2),
-    '& .MuiInputBase-input': {
-      height: '4rem', // Double the height of the input
+    // width: '100%', // Takes full width of its parent (inquirySection)
+    // marginBottom: theme.spacing(2),
+    // '& .MuiInputBase-input': {
+    //   height: '4rem', // Double the height of the input
+    // },
+    // margin: theme.spacing(2, 0),
+    margin: '8px',
+    width: '100%',
+    [theme.breakpoints.up('md')]: {
+      width: '60%',
     },
   },
   searchForm: {
     display: 'flex',
-    flexDirection: 'column',
+    flexDirection: 'row',
     alignItems: 'center', // This ensures the children align horizontally at the center
     justifyContent: 'center', // This will center the children vertically
     '& > *': { // Applies to all immediate children
@@ -199,6 +218,10 @@ const useStyles = makeStyles((theme) => ({
     width: '10%', // Width for the "정확도 수치" cell
     textAlign: 'center'
   },
+  submitButton: {
+    padding: '15px 14px',
+    margin: '8px',
+  }
   
 
 }));
@@ -305,6 +328,19 @@ const SearchPage = () => {
   
 
   const handleSearch = async (event) => {
+    if (loading) {
+      return;
+    }
+    if (query.trim().length < 10) {
+      alert('10자 이상 입력해주세요.');
+      return;
+    }
+
+    // SQL INJECTION
+    if (!checkSearchedWord(query)) {
+      return;
+    }
+
     event.preventDefault();
     setLoading(true);
     setPage(1)
@@ -357,9 +393,13 @@ const SearchPage = () => {
 
   const handleSendInquiry = async () => {
     setInquiryError('');
-    if (inquiry.length < 10) {
+    if (inquiry.trim().length < 10) {
       setInquiryError('문의 내용은 최소 10자 이상이어야 합니다.');
       return; // Stop the function if the validation fails
+    }
+
+    if (!checkSearchedWord(inquiry)) {
+      return;
     }
 
     const access_token = localStorage.getItem('access_token');
@@ -421,8 +461,39 @@ const SearchPage = () => {
     navigate('/search');
   };
 
+  const checkSearchedWord = (obj) => {
+    if (obj.length > 0) {
+      //특수문자 제거
+      var expText = /[%=><]/;
+      if (expText.test(obj) == true) {
+        alert("특수문자를 입력 할수 없습니다.");
+        obj.value = obj.value.split(expText).join("");
+        return false;
+      }
+
+      //특정문자열(sql예약어의 앞뒤공백포함) 제거
+      var sqlArray = new Array(
+        //sql 예약어
+        "OR", "SELECT", "INSERT", "DELETE", "UPDATE", "CREATE", "DROP", "EXEC",
+        "UNION", "FETCH", "DECLARE", "TRUNCATE"
+      );
+
+      var regex;
+      for (var i = 0; i < sqlArray.length; i++) {
+        regex = new RegExp(sqlArray[i], "gi");
+
+        if (regex.test(obj)) {
+          alert("\"" + sqlArray[i] + "\"와(과) 같은 특정문자로 검색할 수 없습니다.");
+          obj = obj.replace(regex, "");
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
   return (
-    <div>
+    <div className={classes.wrapper}>
         <div className={classes.header}>
           <img src={logoImage} alt="Logo" className={classes.logo} onClick={() => logoClick()}/>
           <div>
@@ -435,7 +506,7 @@ const SearchPage = () => {
           </div>
         </div>
         <div className={classes.searchContainer}>
-            <form onSubmit={handleSearch} className={classes.searchForm}>
+            <div className={classes.searchForm}>
                 <TextField
                 className={classes.searchBar}
                 variant="outlined"
@@ -444,10 +515,10 @@ const SearchPage = () => {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 />
-                <Button type="submit" variant="contained" color="primary">
+                <Button className={classes.submitButton} type="button" variant="contained" color="primary" onClick={handleSearch}>
                 검색하기
                 </Button>
-            </form>
+            </div>
             {loading ? (
               <div className={classes.loadingContainer}>
                 <CircularProgress />
@@ -504,7 +575,7 @@ const SearchPage = () => {
             <div className={classes.inquirySection}>
                 <TextField
                   className={classes.inquiryInput}
-                  label="관리자에게 문의 주시면, 최대한 빠른 시일내에 이메일 답변 전달 드립니다."
+                  placeholder="관리자에게 문의 주시면, 최대한 빠른 시일내에 이메일 답변 전달 드립니다."
                   variant="outlined"
                   value={inquiry} 
                   multiline
@@ -513,6 +584,7 @@ const SearchPage = () => {
                   helperText={inquiryError} // This will display the error message
                 />
                 <Button
+                  className={classes.submitButton}
                   variant="contained"
                   color="secondary"
                   onClick={handleSendInquiry}
@@ -530,6 +602,7 @@ const SearchPage = () => {
               </Alert>
             </Snackbar>
         </div>
+        <Footer />
     </div>
   );
 };

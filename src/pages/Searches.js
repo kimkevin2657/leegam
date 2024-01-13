@@ -8,6 +8,7 @@ import Header from './Header'; // Make sure to adjust the path as needed
 import { useNavigate } from 'react-router-dom';
 import verifyUser from '../utils/verifyuser';
 import GetAppIcon from '@mui/icons-material/GetApp'; 
+import Footer from './Footer';
 
 const useStyles = makeStyles({
   table: {
@@ -16,6 +17,15 @@ const useStyles = makeStyles({
   searchQueryCell: {
     width: '40%', // Set the width for the search query column
   },
+  body: {
+    paddingTop: '66px',
+  },
+  download: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  }
 });
 
 export default function SearchHistoryTable() {
@@ -115,23 +125,25 @@ export default function SearchHistoryTable() {
   return (
     <div>
       <Header isAdmin={isAdmin}/> {/* Insert Header component */}
-      <Paper>
+      <Paper className={classes.body}>
+        <div className={classes.download} align="right">
+          <div>
+          회원들의 검색 내역을 조회할 수 있습니다
+          </div>
+          <IconButton onClick={handleDownload}>
+            <b style={{fontSize: 15}}>엑셀 다운로드</b>
+            <GetAppIcon />
+          </IconButton>
+        </div>
         <TableContainer component={Paper}>
           <Table className={classes.table} aria-label="simple table">
             <TableHead>
-                <TableRow>
-                  회원들의 검색 내역을 조회할 수 있습니다
-                </TableRow>
                 <TableRow>
                     <TableCell>유저 ID 번호</TableCell>
                     <TableCell>유저 닉네임</TableCell>
                     <TableCell>유저 이메일</TableCell>
                     <TableCell className={classes.searchQueryCell}>검색 내용</TableCell>
                     <TableCell>검색 시간</TableCell> {/* New column for query time */}
-                    <IconButton onClick={handleDownload}>
-                      <b style={{fontSize: 15}}>엑셀 다운로드</b>
-                      <GetAppIcon />
-                    </IconButton>
                 </TableRow>
             </TableHead>
 
@@ -151,15 +163,19 @@ export default function SearchHistoryTable() {
           </Table>
         </TableContainer>
         <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
+          rowsPerPageOptions={[]}
           component="div"
           count={searchHistories.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
+          labelDisplayedRows={() => {
+            return `${page+1}-${Math.floor(searchHistories.length / rowsPerPage)+1}`;
+          }}
         />
       </Paper>
+      <Footer />
     </div>
   );
 }

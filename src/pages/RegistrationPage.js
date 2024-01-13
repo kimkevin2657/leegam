@@ -28,9 +28,13 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TextField, Button, makeStyles } from '@material-ui/core';
 import logoImage from '../leegam-logo-header.png';
+import Footer from './Footer';
 
 // Styles defined using makeStyles
 const useStyles = makeStyles((theme) => ({
+  wrapper: {
+    position: 'relative',
+  },
   header: {
     display: 'flex',
     justifyContent: 'space-between',
@@ -39,6 +43,11 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(1, 2),
     marginBottom: theme.spacing(3),
     boxShadow: '0 2px 4px rgba(0,0,0,0.1)', // Added shadow for border effect
+    position: 'fixed',
+    top: 0,
+    width: '100%',
+    zIndex: '1',
+    boxSizing: 'border-box',
   },
   logo: {
     height: '50px',
@@ -58,6 +67,7 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: 'center',
     height: '100vh',
     backgroundColor: '#fff',
+    paddingTop: '66px',
   },
   textField: {
     margin: theme.spacing(1),
@@ -72,13 +82,7 @@ const useStyles = makeStyles((theme) => ({
     '&:hover': {
       backgroundColor: '#1769aa',
     },
-  },
-  footer: {
-    backgroundColor: '#111111',
-    color: 'white',
-    textAlign: 'center',
-    padding: theme.spacing(2),
-  },
+  }
 }));
 
 const RegistrationPage = () => {
@@ -99,6 +103,11 @@ const RegistrationPage = () => {
       // Stop the registration process if validation fails
       return;
     }
+
+    if (!checkSearchedWord(username)) {
+      return;
+    }
+    
     const registrationData = {
       username: username,
       password: password,
@@ -170,10 +179,40 @@ const RegistrationPage = () => {
   
     return isValid;
   };
-  
+
+  const checkSearchedWord = (obj) => {
+    if (obj.length > 0) {
+      //특수문자 제거
+      var expText = /[%=><]/;
+      if (expText.test(obj) == true) {
+        alert("특수문자를 입력 할수 없습니다.");
+        obj.value = obj.value.split(expText).join("");
+        return false;
+      }
+
+      //특정문자열(sql예약어의 앞뒤공백포함) 제거
+      var sqlArray = new Array(
+        //sql 예약어
+        "OR", "SELECT", "INSERT", "DELETE", "UPDATE", "CREATE", "DROP", "EXEC",
+        "UNION", "FETCH", "DECLARE", "TRUNCATE"
+      );
+
+      var regex;
+      for (var i = 0; i < sqlArray.length; i++) {
+        regex = new RegExp(sqlArray[i], "gi");
+
+        if (regex.test(obj)) {
+          alert("\"" + sqlArray[i] + "\"와(과) 같은 특정문자로 검색할 수 없습니다.");
+          obj = obj.replace(regex, "");
+          return false;
+        }
+      }
+    }
+    return true;
+  }
 
   return (
-    <div>
+    <div className={classes.wrapper}>
         <div className={classes.header}>
           <img src={logoImage} alt="Logo" className={classes.logo} onClick={() => logoClick()}/>
           <div>
@@ -222,11 +261,7 @@ const RegistrationPage = () => {
             회원가입
           </Button>
         </div>
-        <div className={classes.footer}>
-          <div>(주)이감 / 대표자: 김봉소 / 사업자등록번호: 120-87-85755 / 통신판매업신고번호: 제 2018-서울서초-1781 / 개인정보관리자: 이상엽</div>
-          <div>서울특별시 서초구 강남대로 16길 3 (양재디에스타워, 구 아산벤처타워) 3층</div>
-          <div>Copyright © (주)이감. All Rights Reserved.</div>
-      </div>
+        <Footer />
     </div>
 
   );

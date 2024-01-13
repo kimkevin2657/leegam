@@ -8,10 +8,14 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import Header from './Header'; // Adjust the path as needed
 import { useNavigate } from 'react-router-dom';
 import verifyUser from '../utils/verifyuser';
+import Footer from './Footer';
 
 const useStyles = makeStyles({
   table: {
     minWidth: 650,
+  },
+  body: {
+    paddingTop: '66px',
   },
 });
 
@@ -106,6 +110,7 @@ export default function UserTable() {
           row.id === id ? { ...row, admin: newAdminStatus } : row
         )
       );
+      alert('변경되었습니다.');
       window.location.reload();
     } else {
       console.error('Failed to update admin status');
@@ -122,6 +127,9 @@ export default function UserTable() {
   };
 
   const handleDelete = (id) => {
+    if (!window.confirm('정말 삭제하시겠습니까?')) {
+      return;
+    }
     // Delete logic (API call) and then update state
     fetch('http://158.247.255.4:4545/users', {
         method: 'POST',
@@ -140,7 +148,7 @@ export default function UserTable() {
   return (
     <div>
       <Header isAdmin={true} /> {/* Assuming isAdmin is true for demonstration */}
-      <Paper>
+      <Paper className={classes.body}>
         <TableContainer component={Paper}>
           <Table className={classes.table} aria-label="simple table">
             <TableHead>
@@ -183,15 +191,19 @@ export default function UserTable() {
           </Table>
         </TableContainer>
         <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
+          rowsPerPageOptions={[]}
           component="div"
           count={rows.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
+          labelDisplayedRows={() => {
+            return `${page+1}-${Math.floor(rows.length / rowsPerPage)+1}`;
+          }}
         />
       </Paper>
+      <Footer />
     </div>
   );
 }

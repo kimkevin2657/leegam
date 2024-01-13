@@ -12,6 +12,11 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: '#fff',
     padding: theme.spacing(1, 2),
     boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+    position: 'fixed',
+    top: 0,
+    width: '100%',
+    zIndex: '1',
+    boxSizing: 'border-box',
   },
   logo: {
     height: '50px',

@@ -10,6 +10,7 @@ import {
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
   TablePagination
 } from '@mui/material';
+import Footer from './Footer';
 
 const useStyles = makeStyles({
   root: {
@@ -20,6 +21,9 @@ const useStyles = makeStyles({
   },
   buttonContainer: {
     marginTop: 20,
+  },
+  body: {
+    paddingTop: '66px',
   },
 });
 
@@ -120,7 +124,7 @@ const Modify = () => {
     <div>
       <Header isAdmin={isAdmin}/> {/* Insert Header component */}
 
-      <Paper>
+      <Paper className={classes.body}>
         <TableRow>
             백엔드에 갱신된 질의 데이터를 업로드하거나, 현재 사용되고 있는 최신 질의 데이터를 다운로드할 수 있습니다
         </TableRow>
@@ -162,6 +166,7 @@ const Modify = () => {
           )}
         </div>
       </Paper>
+      <Footer />
     </div>
   );
 };

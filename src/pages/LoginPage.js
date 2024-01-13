@@ -31,6 +31,7 @@ import { useNavigate } from 'react-router-dom';
 import { TextField, Button, makeStyles } from '@material-ui/core';
 import verifyUser from '../utils/verifyuser';
 import logoImage from '../leegam-logo-header.png';
+import Footer from './Footer';
 
 // Styles defined using makeStyles
 const useStyles = makeStyles((theme) => ({
@@ -43,6 +44,7 @@ const useStyles = makeStyles((theme) => ({
   contentWrap: {
     flex: 1, // Allows this div to grow and fill available space, pushing the footer down
     // ... Other styling as needed
+    position: 'relative',
   },
   header: {
     display: 'flex',
@@ -52,6 +54,11 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(1, 2),
     marginBottom: theme.spacing(3),
     boxShadow: '0 2px 4px rgba(0,0,0,0.1)', // Added shadow for border effect
+    position: 'fixed',
+    top: 0,
+    width: '100%',
+    zIndex: '1',
+    boxSizing: 'border-box',
   },
   logo: {
     height: '50px', // Adjust as needed
@@ -88,15 +95,6 @@ const useStyles = makeStyles((theme) => ({
     '&:hover': {
       backgroundColor: '#1769aa',
     },
-  },
-  footer: {
-    backgroundColor: '#111111',
-    color: 'white',
-    width: '100%',
-    textAlign: 'center', // Center align text
-    padding: theme.spacing(2), // Add some padding
-    position: 'absolute',
-    bottom: 0,
   },
 }));
 
@@ -252,11 +250,7 @@ const LoginPage = () => {
           회원가입
         </Button>
       </div>
-      <div className={classes.footer}>
-        <div>(주)이감 / 대표자: 김봉소 / 사업자등록번호: 120-87-85755 / 통신판매업신고번호: 제 2018-서울서초-1781 / 개인정보관리자: 이상엽</div>
-        <div>서울특별시 서초구 강남대로 16길 3 (양재디에스타워, 구 아산벤처타워) 3층</div>
-        <div>Copyright © (주)이감. All Rights Reserved.</div>
-      </div>
+      <Footer />
     </div>
   </div>
   );
