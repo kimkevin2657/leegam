@@ -506,11 +506,18 @@ const SearchPage = () => {
           </div>
         </div>
         <div className={classes.searchContainer}>
+            {/* New Title and Description in Korean */}
+            <div className={classes.titleSection}>
+                <Typography variant="h4">이감 QA 검색</Typography>
+                <Typography variant="subtitle1">
+                    교재 QA 데이터를 검색 해주세요.
+                </Typography>
+            </div>
             <div className={classes.searchForm}>
                 <TextField
                 className={classes.searchBar}
                 variant="outlined"
-                placeholder="질문을 입력해주세요..."
+                placeholder="검색하실 교재 QA 데이터 관련 질문을 입력해주세요..."
                 fullWidth
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
@@ -573,9 +580,13 @@ const SearchPage = () => {
               </>
             )}
             <div className={classes.inquirySection}>
+                {/* <Typography variant="h6">원하는 답변을 찾지 못하셨나요?</Typography>
+                <Typography variant="body1">
+                    직접 문의하시면 가능한 빨리 답변 드리겠습니다.
+                </Typography> */}
                 <TextField
                   className={classes.inquiryInput}
-                  placeholder="관리자에게 문의 주시면, 최대한 빠른 시일내에 이메일 답변 전달 드립니다."
+                  placeholder="원하는 답변을 찾지 못하셨나요? 관리자에게 문의 주시면, 빠른 시일내에 이메일 답변 전달 드립니다."
                   variant="outlined"
                   value={inquiry} 
                   multiline
