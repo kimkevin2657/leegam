@@ -506,6 +506,12 @@ const SearchPage = () => {
           </div>
         </div>
         <div className={classes.searchContainer}>
+            <div className={classes.titleSection}>
+                <Typography variant="h4">이감 QA 검색</Typography>
+                <Typography variant="subtitle1">
+                    이감 교재 Q/A에 대한 답변을 검색하거나 질문하세요.
+                </Typography>
+            </div>
             <div className={classes.searchForm}>
                 <TextField
                 className={classes.searchBar}
@@ -575,7 +581,7 @@ const SearchPage = () => {
             <div className={classes.inquirySection}>
                 <TextField
                   className={classes.inquiryInput}
-                  placeholder="관리자에게 문의 주시면, 최대한 빠른 시일내에 이메일 답변 전달 드립니다."
+                  placeholder="원하는 답변을 찾지 못하셨나요? 관리자에게 문의 주시면, 빠른 시일내에 이메일 답변 전달 드립니다."
                   variant="outlined"
                   value={inquiry} 
                   multiline
