@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@mui/styles';
 import {
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper,
-  TablePagination, IconButton
+  TablePagination, IconButton, Button
 } from '@mui/material';
 import Header from './Header'; // Make sure to adjust the path as needed
 import { useNavigate } from 'react-router-dom';
@@ -25,6 +25,11 @@ const useStyles = makeStyles({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  downloadBtn: {
+    border: '1px solid rgba(0, 0, 0, 0.54)',
+    borderRadius: '8px',
+    margin: '5px'
   }
 });
 
@@ -101,6 +106,9 @@ export default function SearchHistoryTable() {
   };
 
   const handleDownload = () => {
+    if (!window.confirm('모든데이터가 다운로드 됩니다.')) {
+      return;
+    }
     const csvRows = [
       ['닉네임', '이메일', '검색 쿼리', '검색 시간'], // headers
       ...searchHistories.map(row => [row.username, row.email, row.searchQuery, row.queryTime]), // data
@@ -130,10 +138,11 @@ export default function SearchHistoryTable() {
           <div>
           회원들의 검색 내역을 조회할 수 있습니다
           </div>
-          <IconButton onClick={handleDownload}>
-            <b style={{fontSize: 15}}>엑셀 다운로드</b>
-            <GetAppIcon />
-          </IconButton>
+          <div className={classes.downloadBtn}>
+            <Button onClick={handleDownload} endIcon={<GetAppIcon />} style={{color: 'rgba(0, 0, 0, 0.54)'}}>
+              <b style={{fontSize: 15}}>엑셀 다운로드</b>
+            </Button>
+          </div>
         </div>
         <TableContainer component={Paper}>
           <Table className={classes.table} aria-label="simple table">

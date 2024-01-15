@@ -17,6 +17,7 @@ import verifyUser from '../utils/verifyuser';
 import Header from './Header'; // Adjust the path as needed
 import GetAppIcon from '@mui/icons-material/GetApp'; // This is an example, replace with your preferred icon
 import Footer from './Footer';
+import { Button } from '@mui/material';
 
 
 const useStyles = makeStyles({
@@ -39,6 +40,11 @@ const useStyles = makeStyles({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  downloadBtn: {
+    border: '1px solid rgba(0, 0, 0, 0.54)',
+    borderRadius: '8px',
+    margin: '5px'
   }
 });
 
@@ -161,6 +167,9 @@ export default function InquiryTable() {
   //   link.click(); // This will download the data file named "inquiries.csv".
   // };
   const handleDownload = () => {
+    if (!window.confirm('모든데이터가 다운로드 됩니다.')) {
+      return;
+    }
     const csvRows = [
       ['문의자 이메일', '문의 내용', '문의 상태'], // headers
       ...rows.map(row => [row.email, row.content, row.status]), // data
@@ -209,10 +218,11 @@ export default function InquiryTable() {
           <div>
             회원들이 문의한 내용을 확인하고, csv 형식으로 내려 받을 수 있습니다
           </div>
-          <IconButton onClick={handleDownload}>
-            <b style={{fontSize: 15}}>엑셀 다운로드</b>
-            <GetAppIcon />
-          </IconButton>
+          <div className={classes.downloadBtn}>
+            <Button onClick={handleDownload} endIcon={<GetAppIcon />} style={{color: 'rgba(0, 0, 0, 0.54)'}}>
+              <b style={{fontSize: 15}}>엑셀 다운로드</b>
+            </Button>
+          </div>
         </div>
         <TableContainer component={Paper}>
           <Table className={classes.table} aria-label="simple table">

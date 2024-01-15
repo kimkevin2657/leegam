@@ -20,10 +20,30 @@ const useStyles = makeStyles({
     padding: 20,
   },
   buttonContainer: {
-    marginTop: 20,
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: 10
+  },
+  downloadBtn: {
+    // marginTop: 20,
+    border: '1px solid rgba(0, 0, 0, 0.54)',
+    borderRadius: '8px',
   },
   body: {
     paddingTop: '66px',
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '0 20px'
+  },
+  footer: {
+    display: 'block',
+    position: 'absolute',
+    bottom: 0,
+    width: '100%'
   },
 });
 
@@ -130,10 +150,11 @@ const Modify = () => {
         </TableRow>
         <div className={classes.buttonContainer}>
             <div style={{height: 100}}></div>
-          <IconButton onClick={handleDownload}>
-            <b style={{ fontSize: 15 }}>다운로드하기</b>
-            <GetAppIcon />
-          </IconButton>
+          <div className={classes.downloadBtn}>
+            <Button onClick={handleDownload} endIcon={<GetAppIcon />} style={{color: 'rgba(0, 0, 0, 0.54)'}}>
+              <b style={{fontSize: 15}}>엑셀 다운로드</b>
+            </Button>
+          </div>
 
           <div style={{height: 100}}></div>
 
@@ -166,7 +187,9 @@ const Modify = () => {
           )}
         </div>
       </Paper>
-      <Footer />
+      <div className={classes.footer}>
+        <Footer/>
+      </div>
     </div>
   );
 };
